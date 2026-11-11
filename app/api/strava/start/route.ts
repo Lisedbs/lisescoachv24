@@ -1,0 +1,3 @@
+import {NextResponse} from 'next/server'
+import crypto from 'node:crypto'
+export async function GET(req:Request){const id=process.env.STRAVA_CLIENT_ID;const redirect=process.env.STRAVA_REDIRECT_URI;if(!id||!redirect)return new NextResponse('Strava non configuré',{status:500});const state=crypto.randomBytes(24).toString('hex');const u=new URL('https://www.strava.com/oauth/authorize');u.searchParams.set('client_id',id);u.searchParams.set('redirect_uri',redirect);u.searchParams.set('response_type','code');u.searchParams.set('approval_prompt','auto');u.searchParams.set('scope','read,activity:read_all');u.searchParams.set('state',state);const r=NextResponse.redirect(u);r.cookies.set('oauth_state',state,{httpOnly:true,secure:true,sameSite:'lax',maxAge:600,path:'/'});return r}
